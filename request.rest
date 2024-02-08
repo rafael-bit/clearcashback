@@ -1,0 +1,32 @@
+POST http://localhost:8080/api/services
+Content-Type: application/json
+
+{
+	"name": "Rafael Áquila",
+	"email": "Rafael@gmail.com",
+	"password": "123456789",
+	"image": "https://legitbabenames.files.wordpress.com/2009/10/stress-relief-meditation-raisin.jpg?w=122&h=150"
+}
+
+###
+
+GET http://localhost:8080/api/services
+
+###
+
+GET http://localhost:8080/api/services/65bd342d473b423024f5a203
+
+###
+
+DELETE http://localhost:8080/api/services/65bd978ce3f410f33875442f
+
+###
+PUT http://localhost:8080/api/services/65bd49f934e52d98e6c42869
+Content-Type: application/json
+
+{
+	"name": "Rafael Áquila Ribeiro",
+	"email": "Rafael@gmail.com",
+	"password": "123456789",
+	"image": "https://legitbabenames.files.wordpress.com/2009/10/stress-relief-meditation-raisin.jpg?w=122&h=150"
+}
