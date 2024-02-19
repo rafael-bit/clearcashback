@@ -20,7 +20,7 @@ const serviceSchema = new Schema({
 		required: false,
 	},
 	money: {
-		type: parseFloat,
+		type: Number,
 		required: false,
 	},
 	expenses: {
@@ -28,14 +28,14 @@ const serviceSchema = new Schema({
 		required: false,
 	},
 	investments: {
-		type: flo,
-		required: false
-	}
+		type: Number,
+		required: false,
+	},
 }, { timestamps: true });
 
 const UserService = mongoose.model("UserService", serviceSchema);
 
 module.exports = {
 	UserService,
-	serviceSchema
+	serviceSchema,
 };
