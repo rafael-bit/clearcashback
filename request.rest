@@ -3,7 +3,7 @@ Content-Type: application/json
 
 {
 	"name": "Rafael Áquila",
-	"email": "Rafaael@gmail.com",
+	"email": "Rafael@gmail.com",
 	"password": "123456789",
 	"image": "https://legitbabenames.files.wordpress.com/2009/10/stress-relief-meditation-raisin.jpg?w=122&h=150"
 }
@@ -14,11 +14,11 @@ GET http://localhost:8080/api/services
 
 ###
 
-GET http://localhost:8080/api/services/65d367995a3e646ca5451118
+GET http://localhost:8080/api/services/65be47ae8ac1ea3f7457286c
 
 ###
 
-DELETE http://localhost:8080/api/services/65bd978ce3f410f33875442f
+DELETE http://localhost:8080/api/services/65d367995a3e646ca5451118
 
 ###
 PUT http://localhost:8080/api/services/65bd49f934e52d98e6c42869
@@ -30,3 +30,8 @@ Content-Type: application/json
 	"password": "123456789",
 	"image": "https://legitbabenames.files.wordpress.com/2009/10/stress-relief-meditation-raisin.jpg?w=122&h=150"
 }
+
+###
+
+POST http://localhost:8080/api/login/
+Content-Type: application/json
