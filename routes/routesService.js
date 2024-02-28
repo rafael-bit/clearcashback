@@ -1,10 +1,10 @@
 const router = require("express").Router();
-const serviceController = require("../controllers/userController");
+const userController = require("../controllers/User");
 
-router.route("/services").post((req, res) => serviceController.create(req, res));
-router.route("/services").get((req, res) => serviceController.getAll(req, res))
-router.route("/services/:id").get((req, res) => serviceController.get(req, res));
-router.route("/services/:id").delete((req, res) => serviceController.delete(req, res))
-router.route("/services/:id").put((req, res) => serviceController.put(req, res))
+router.route("/services").post((req, res) => userController.create(req, res));
+router.route("/services").get((req, res) => userController.getAll(req, res))
+router.route("/services/:id").get((req, res) => userController.get(req, res));
+router.route("/services/:id").delete((req, res) => userController.delete(req, res))
+router.route("/services/:id").put((req, res) => userController.put(req, res))
 
 module.exports = router;
