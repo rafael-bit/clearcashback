@@ -3,101 +3,118 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const dbUser = process.env.DB_USER;
-const dbPassword = process.env.DB_PASSWORD;
-const port = 8080;
+const cors = require('cors');
+
 const app = express();
+const port = process.env.PORT || 8080;
 
 app.use(express.json());
+app.use(cors());
 
 const User = require('./models/User');
 
 app.get('/', (req, res) => {
-	res.status(200).json({ msg: 'teste' });
+	res.status(200).json({ message: 'Welcome to the application!' });
 });
 
-app.post('/auth/register', async (req, res) => {
-	const { name, email, password, confirmPassword, imageProfile, expenses, profit } = req.body;
-	if (!name) {
-		return res.status(422).json({ msg: 'Name is mandatory' });
-	} else if (!email) {
-		return res.status(422).json({ msg: 'Email is mandatory' });
-	} else if (!password) {
-		return res.status(422).json({ msg: 'Password is mandatory' });
-	} else if (password !== confirmPassword) {
-		return res.status(422).json({ msg: "Passwords don't match" });
+app.get("/user/:id", checkToken, async (req, res) => {
+	try {
+		const user = await User.findById(req.params.id).select('-password');
+
+		if (!user) {
+			return res.status(404).json({ error: 'User not found' });
+		}
+
+		res.status(200).json({ user });
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error: 'Internal Server Error' });
 	}
+});
 
-	const userExists = await User.findOne({ email: email });
+function checkToken(req, res, next) {
+	const authHeader = req.headers['authorization'];
+	const token = authHeader && authHeader.split(' ')[1];
 
-	if (userExists) {
-		return res.status(422).json({ msg: "There is already one with that email" });
+	if (!token) {
+		return res.status(401).json({ error: 'Access denied' });
 	}
-
-	const salt = await bcrypt.genSalt(12);
-	const passwordHash = await bcrypt.hash(password, salt);
-
-	const user = new User({
-		name,
-		email,
-		password: passwordHash
-	});
 
 	try {
-		await user.save();
-		res.status(201).json({ msg: 'User created successfully' });
-	} catch (err) {
-		res.status(500).json({ msg: 'Internal Error 500, try again later' });
+		const secret = process.env.SECRET;
+		jwt.verify(token, secret);
+		next();
+	} catch (error) {
+		console.error(error);
+		res.status(401).json({ error: 'Invalid token' });
+	}
+}
+
+app.post('/auth/register', async (req, res) => {
+	try {
+		const { name, email, password, confirmPassword } = req.body;
+
+		if (!name || !email || !password || password !== confirmPassword) {
+			return res.status(422).json({ error: 'Invalid input data' });
+		}
+
+		const userExists = await User.findOne({ email });
+
+		if (userExists) {
+			return res.status(422).json({ error: 'User with this email already exists' });
+		}
+
+		const salt = await bcrypt.genSalt(12);
+		const passwordHash = await bcrypt.hash(password, salt);
+
+		const newUser = new User({
+			name,
+			email,
+			password: passwordHash,
+		});
+
+		await newUser.save();
+		res.status(201).json({ message: 'User created successfully' });
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error: 'Internal Server Error' });
 	}
 });
 
 app.post("/auth/login", async (req, res) => {
-	const { email, password } = req.body;
-
-	if (!email) {
-		return res.status(422).json({ msg: 'Email is mandatory' });
-	}
-	if (!password) {
-		return res.status(422).json({ msg: 'Password is mandatory' });
-	}
-
 	try {
-		const user = await User.findOne({ email: email });
+		const { email, password } = req.body;
 
-		if (!user) {
-			return res.status(404).json({ msg: 'User not found' });
+		if (!email || !password) {
+			return res.status(422).json({ error: 'Invalid input data' });
 		}
 
-		const isPasswordValid = await bcrypt.compare(password, user.password);
+		const user = await User.findOne({ email });
 
-		if (!isPasswordValid) {
-			return res.status(401).json({ msg: 'Invalid password' });
+		if (!user || !(await bcrypt.compare(password, user.password))) {
+			return res.status(401).json({ error: 'Invalid credentials' });
 		}
 
-		try {
-			const secret = process.env.SECRET;
-			const token = jwt.sign(
-				{
-					id: user._id, 
-				},
-				secret
-			);
-			res.status(200).json({ msg: 'Login successfully!', token });
-		} catch (err) {
-			console.error("Error in auth/login:", err);
-			res.status(500).json({ msg: "Internal Server Error 500" });
+		const secret = process.env.SECRET;
+
+		if (!secret) {
+			return res.status(500).json({ error: 'Internal Server Error - Missing JWT secret' });
 		}
 
-	} catch (err) {
-		console.error("Error in auth/login:", err);
-		res.status(500).json({ msg: "Internal Server Error 500" });
+		const token = jwt.sign({ id: user._id }, secret);
+		res.status(200).json({ message: 'Login successful!', token });
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error: 'Internal Server Error' });
 	}
 });
 
-mongoose.connect(`mongodb+srv://${dbUser}:${dbPassword}@cluster0.vm6qsdj.mongodb.net/clearclash?retryWrites=true&w=majority&appName=Cluster0`)
+mongoose.connect(
+	`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.vm6qsdj.mongodb.net/clearclash?retryWrites=true&w=majority&appName=Cluster0`
+)
 	.then(() => {
 		app.listen(port, () => {
-			console.log(`Servidor Rodando na porta: ${port}`);
+			console.log(`Server is running on port: ${port}`);
 		});
 	})
-	.catch((err) => console.log(err));
+	.catch((err) => console.error('Database connection error:', err));
