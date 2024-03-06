@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
 	res.status(200).json({ message: 'Welcome to the application!' });
 });
 
-app.get("/user/:id", checkToken, async (req, res) => {
+app.get("/user/:id", async (req, res) => {
 	try {
 		const user = await User.findById(req.params.id).select('-password');
 
@@ -102,7 +102,8 @@ app.post("/auth/login", async (req, res) => {
 		}
 
 		const token = jwt.sign({ id: user._id }, secret);
-		res.status(200).json({ message: 'Login successful!', token });
+
+		res.status(200).json({ message: 'Login successful!', token, id: user._id });
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ error: 'Internal Server Error' });

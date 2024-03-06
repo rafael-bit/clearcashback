@@ -17,7 +17,3 @@ Content-Type: application/json
 	"email": "Rafael@gmail.com",
 	"password": "123456789"
 }
-
-###
-
-GET http://localhost:8080/user/65dcf117f8b3243061eefef3
