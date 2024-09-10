@@ -6,7 +6,7 @@ exports.register = async (req, res) => {
 	try {
 		const { name, email, password, img } = req.body;
 
-		if (!name || !email || !password || !img) {
+		if (!name || !email || !password) {
 			return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
 		}
 
