@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Transaction = require('../models/Transaction');
 
 exports.createTransaction = async (req, res) => {
@@ -66,5 +67,50 @@ exports.deleteTransaction = async (req, res) => {
 		res.status(200).json({ message: 'Transação excluída com sucesso' });
 	} catch (error) {
 		res.status(500).json({ message: 'Erro ao excluir transação', error: error.message });
+	}
+};
+
+exports.getFinancialReport = async (req, res) => {
+	try {
+		const userId = req.params.userId;
+
+		const transactions = await Transaction.find({ userId });
+
+		let totalIncome = 0;
+		let totalExpense = 0;
+		const monthlyIncome = {};
+		const monthlyExpense = {};
+
+		transactions.forEach(transaction => {
+			const amount = transaction.amount;
+			const date = new Date(transaction.date);
+			const monthYear = `${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}`;
+
+			if (transaction.amount > 0) {
+				totalIncome += amount;
+				if (!monthlyIncome[monthYear]) {
+					monthlyIncome[monthYear] = 0;
+				}
+				monthlyIncome[monthYear] += amount;
+			} else {
+				totalExpense += amount;
+				if (!monthlyExpense[monthYear]) {
+					monthlyExpense[monthYear] = 0;
+				}
+				monthlyExpense[monthYear] += Math.abs(amount);
+			}
+		});
+
+		const report = {
+			totalIncome,
+			totalExpense,
+			netBalance: totalIncome - totalExpense,
+			monthlyIncome: Object.entries(monthlyIncome).map(([month, amount]) => ({ month, amount })),
+			monthlyExpense: Object.entries(monthlyExpense).map(([month, amount]) => ({ month, amount })),
+		};
+
+		res.status(200).json({ userId, report });
+	} catch (error) {
+		res.status(500).json({ message: 'Erro ao gerar relatório', error: error.message });
 	}
 };
