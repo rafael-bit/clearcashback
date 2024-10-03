@@ -1,6 +1,6 @@
-const User = require('../models/User');
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const User = require('../models/User');
 
 exports.register = async (req, res) => {
 	try {
@@ -41,7 +41,13 @@ exports.login = async (req, res) => {
 			return res.status(400).json({ message: 'Credenciais inválidas' });
 		}
 
-		res.status(200).json({ message: 'Login bem-sucedido!', id: user._id });
+		const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+		res.status(200).json({
+			message: 'Login bem-sucedido!',
+			token,
+			id: user._id
+		});
 	} catch (error) {
 		console.error('Erro no login:', error);
 		res.status(500).json({ message: 'Erro no login' });
@@ -52,7 +58,6 @@ exports.getAllUsers = async (req, res) => {
 	try {
 		const users = await User.find();
 		res.status(200).json(users);
-
 	} catch (error) {
 		console.error('Erro ao obter usuários:', error);
 		res.status(500).json({ message: 'Erro ao obter usuários' });
