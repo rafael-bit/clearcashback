@@ -2,8 +2,8 @@ const swaggerAutogen = require('swagger-autogen')();
 
 const doc = {
 	info: {
-		title: 'API de Exemplo',
-		description: 'Descrição da API',
+		title: 'API ClearCash',
+		description: 'ClearCash our finance API',
 	},
 	host: 'localhost:8080',
 	schemes: ['http'],

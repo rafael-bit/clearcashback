@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon index.js",
+    "test": "jest",
     "start": "node config/swagger.js"
   },
   "keywords": [],
@@ -23,5 +23,9 @@
     "nodemon": "^3.0.3",
     "swagger-autogen": "^2.23.7",
     "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
   }
 }

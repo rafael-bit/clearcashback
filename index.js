@@ -20,8 +20,11 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-	console.log(`Servidor rodando na porta ${PORT}`);
-});
 
-module.exports = app;
+function startServer() {
+	return app.listen(PORT, () => {
+		console.log(`Servidor rodando na porta ${PORT}`);
+	});
+}
+
+module.exports = { app, startServer };
