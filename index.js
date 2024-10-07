@@ -2,11 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/user');
-const transactionRoutes = require('./routes/transactions');
-
+const transactionRoutes = require('./routes/transaction');
 const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('./config/swagger_output.json');
-
+const { errorHandler } = require('./middlewares/errorHandler');
 require('dotenv').config();
 
 const app = express();
@@ -18,9 +17,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
-app.use((err, req, res, next) => {
-	res.status(500).json({ message: err.message });
-});
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {

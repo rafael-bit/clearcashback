@@ -1,25 +1,21 @@
 const mongoose = require('mongoose');
 const Transaction = require('../models/Transaction');
 
+const Joi = require('joi');
+
 exports.createTransaction = async (req, res) => {
-	try {
-		const { userId, amount, category, date, description } = req.body;
-
-		const newTransaction = new Transaction({
-			userId,
-			amount,
-			category,
-			date,
-			description,
-		});
-
-		await newTransaction.save();
-
-		res.status(201).json({ message: 'Transação criada com sucesso', transaction: newTransaction });
-	} catch (error) {
+	const schema = Joi.object({
+		userId: Joi.string().required(),
+		amount: Joi.number().required(),
+		category: Joi.string().required(),
+		date: Joi.date().required(),
+		description: Joi.string().optional(),
+	});
+	res.status(201).json({ message: 'Transação criada com sucesso', transaction: newTransaction });
+	if (error) {
 		res.status(500).json({ message: 'Erro ao criar transação', error: error.message });
 	}
-};
+}
 
 exports.getAllTransactions = async (req, res) => {
 	try {
