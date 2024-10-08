@@ -10,15 +10,12 @@ beforeAll(() => {
 
 afterAll(async () => {
 	await mongoose.connection.close();
-	server.close();
+	if (server) {
+		server.close();
+	}
 });
 
 describe('Testes para a API de usuários', () => {
-	afterAll(async () => {
-		await mongoose.connection.close();
-		server.close();
-	});
-
 	it('Deve registrar um novo usuário', async () => {
 		const res = await request(app)
 			.post('/api/users')
